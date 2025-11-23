@@ -59,31 +59,31 @@ The application will start at: http://127.0.0.1:8000
 🔑 Demo Credentials (Admin)
 To test the Admin features immediately, use the hardcoded demo credentials required by the assignment:
 
-**Email:** hire-me@anshumat.org
+* **Email:** hire-me@anshumat.org
 
-**Password:** HireMe@2025!
+* **Password:** HireMe@2025!
 
-**Note:** You can also Sign Up as a new user to test the "Customer" flow.
+Note: You can also Sign Up as a new user to test the "Customer" flow.
 
 ### 📱 Features & Usage
 **1. Web Interface (UI)**
-**Login Page (/):** Toggle between Login and Sign Up. Redirects users based on their role (Admin -> Dashboard, Customer -> Shop).
+* **Login Page (/):** Toggle between Login and Sign Up. Redirects users based on their role (Admin -> Dashboard, Customer -> Shop).
 
-**Admin Dashboard (/admin):** Create new coupons with rules like "Flat Amount" or "Percentage", start/end dates, and eligibility criteria.
+* **Admin Dashboard (/admin):** Create new coupons with rules like "Flat Amount" or "Percentage", start/end dates, and eligibility criteria.
 
-**Shop (/shop):** A simulation of an e-commerce cart. Add items and click "Find Best Coupon" to trigger the backend logic.
+* **Shop (/shop):** A simulation of an e-commerce cart. Add items and click "Find Best Coupon" to trigger the backend logic.
 
 **2. API Endpoints**
 You can interact with the raw API via the automatic Swagger documentation at: http://127.0.0.1:8000/docs
 
-**POST /coupons:** Create a coupon.
+* **POST /coupons:** Create a coupon.
 
-**POST /applicable-coupons:** The core logic engine. Inputs a User + Cart and returns the best specific coupon.
+* **POST /applicable-coupons:** The core logic engine. Inputs a User + Cart and returns the best specific coupon.
 
-**POST /login & /signup:** Authentication endpoints.
+* **POST /login & /signup:** Authentication endpoints.
 
 ### ⚠️ Important Note
-Persistence: This project uses In-Memory Storage (Python dictionaries) as allowed by the assignment requirements.
+**Persistence:** This project uses In-Memory Storage (Python dictionaries) as allowed by the assignment requirements.
 
 If you restart the server, all created coupons and new users will be reset.
 
@@ -106,8 +106,8 @@ coupon-system/
 🤖 AI Usage Disclosure
 I utilized AI tools (Gemini) to assist with the development of this project. Specifically:
 
-**Schema Design:** Clarifying how to nest Pydantic models for the complex eligibility JSON structure.
+* **Schema Design:** Clarifying how to nest Pydantic models for the complex eligibility JSON structure.
 
-**Logic Refinement:** Improving the set intersection logic for category-based coupon rules.
+* **Logic Refinement:** Improving the set intersection logic for category-based coupon rules.
 
-**Frontend Templates:** Generating the HTML/CSS boilerplate for the Admin and Shop pages to ensure a clean UI without using a heavy frontend framework.
+* **Frontend Templates:** Generating the HTML/CSS boilerplate for the Admin and Shop pages to ensure a clean UI without using a heavy frontend framework.
