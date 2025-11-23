@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Coupon System</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 350px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-primary { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        .btn-primary:hover { background: #0056b3; }
+        .toggle-link { text-align: center; margin-top: 15px; font-size: 0.9rem; cursor: pointer; color: #007bff; }
+        .toggle-link:hover { text-decoration: underline; }
+        .hint { font-size: 0.8rem; color: #666; background: #eee; padding: 8px; border-radius: 4px; margin-bottom: 15px; }
+        h2 { text-align: center; margin-top: 0; }
+        .error { color: red; font-size: 0.9rem; text-align: center; margin-top: 10px; }
+        .success { color: green; font-size: 0.9rem; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 id="formTitle">Login</h2>
+
+        <input type="text" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password">
+        
+        <button class="btn-primary" id="actionBtn" onclick="handleAuth()">Sign In</button>
+        
+        <p id="msg" class="error"></p>
+
+        <div class="toggle-link" onclick="toggleMode()">
+            <span id="toggleText">New here? Create an account</span>
+        </div>
+    </div>
+
+    <script>
+        let isLoginMode = true;
+
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('msg').innerText = "";
+            
+            if (isLoginMode) {
+                document.getElementById('formTitle').innerText = "Login";
+                document.getElementById('actionBtn').innerText = "Sign In";
+                document.getElementById('toggleText').innerText = "New here? Create an account";
+                document.getElementById('demoHint').style.display = "block";
+            } else {
+                document.getElementById('formTitle').innerText = "Sign Up";
+                document.getElementById('actionBtn').innerText = "Register";
+                document.getElementById('toggleText').innerText = "Already have an account? Sign In";
+                document.getElementById('demoHint').style.display = "none";
+            }
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const msgBox = document.getElementById('msg');
+
+            msgBox.innerText = "";
+            msgBox.className = "error";
+
+            if (!email || !password) {
+                msgBox.innerText = "Please fill in all fields.";
+                return;
+            }
+
+            const endpoint = isLoginMode ? '/login' : '/signup';
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (isLoginMode) {
+                        // LOGIN SUCCESS
+                        localStorage.setItem('userTier', data.userTier);
+                        localStorage.setItem('userId', data.userId);
+                        
+                        // Role-based Redirect
+                        if (data.role === 'ADMIN') {
+                            window.location.href = '/admin';
+                        } else {
+                            window.location.href = '/shop';
+                        }
+                    } else {
+                        // SIGNUP SUCCESS
+                        msgBox.className = "success";
+                        msgBox.innerText = "Account created! Please Sign In.";
+                        setTimeout(() => { toggleMode(); }, 1500);
+                    }
+                } else {
+                    msgBox.innerText = data.detail || "Authentication failed";
+                }
+            } catch (err) {
+                msgBox.innerText = "Server error. Is backend running?";
+            }
+        }
+    </script>
+</body>
+</html>

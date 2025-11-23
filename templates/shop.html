@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shop - Coupon System</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .product, .cart { border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+        button { cursor: pointer; padding: 5px 10px; background: #007bff; color: white; border: none; }
+        .apply-btn { background: #6f42c1; width: 100%; padding: 10px; margin-top: 10px; font-size: 1.1rem; }
+        .coupon-result { background: #d4edda; color: #155724; padding: 10px; margin-top: 10px; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 20px;">
+        <b>Welcome, User (Tier: <span id="userTierDisplay">LOADING...</span>)</b> | 
+        <a href="/admin">Admin Dashboard</a> | <a href="/">Logout</a>
+    </div>
+
+    <div class="grid">
+        <div>
+            <h3>Products</h3>
+            <div class="product">
+                <h4>Smartphone (Electronics)</h4>
+                <p>Price: ₹200</p>
+                <button onclick="addToCart('p1', 'electronics', 200)">Add to Cart</button>
+            </div>
+            <div class="product" style="margin-top: 10px;">
+                <h4>T-Shirt (Fashion)</h4>
+                <p>Price: ₹50</p>
+                <button onclick="addToCart('p2', 'fashion', 50)">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="cart">
+            <h3>Your Cart</h3>
+            <div id="cartItems">No items yet.</div>
+            <hr>
+            <h4>Total: ₹<span id="totalValue">0</span></h4>
+            
+            <button class="apply-btn" onclick="findBestCoupon()">Find Best Coupon</button>
+            
+            <div id="couponResult" class="coupon-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load User Context
+        const tier = localStorage.getItem('userTier') || 'REGULAR';
+        document.getElementById('userTierDisplay').innerText = tier;
+
+        let cart = { items: [] };
+
+        function addToCart(id, cat, price) {
+            cart.items.push({
+                productId: id,
+                category: cat,
+                unitPrice: price,
+                quantity: 1
+            });
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            let total = 0;
+            if (cart.items.length === 0) {
+                container.innerText = "No items yet.";
+            } else {
+                container.innerHTML = cart.items.map(i => `<div>Item (${i.category}) - ₹${i.unitPrice}</div>`).join('');
+            }
+            cart.items.forEach(i => total += i.unitPrice);
+            document.getElementById('totalValue').innerText = total;
+        }
+
+        async function findBestCoupon() {
+            const payload = {
+                user: {
+                    userId: localStorage.getItem('userId') || 'u1',
+                    userTier: tier,
+                    country: "IN",
+                    lifetimeSpend: 0,
+                    ordersPlaced: 0
+                },
+                cart: cart
+            };
+
+            const response = await fetch('/applicable-coupons', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+
+            const resultDiv = document.getElementById('couponResult');
+            const data = await response.json();
+
+            resultDiv.style.display = "block";
+            if (data.couponCode) {
+                resultDiv.style.background = "#d4edda";
+                resultDiv.style.color = "#155724";
+                resultDiv.innerText = `APPLIED: ${data.couponCode} (Save ₹${data.discountAmount})`;
+            } else {
+                resultDiv.style.background = "#f8d7da";
+                resultDiv.style.color = "#721c24";
+                resultDiv.innerText = data.message || "No coupons available";
+            }
+        }
+    </script>
+</body>
+</html>

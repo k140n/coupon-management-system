@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Create Coupon</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer; }
+        .nav { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/shop">Go to Shop</a> | <b>Admin Dashboard</b>
+    </div>
+
+    <h2>Create New Coupon</h2>
+    
+    <div class="form-group">
+        <label>Coupon Code</label>
+        <input type="text" id="code" placeholder="e.g. SUMMER50">
+    </div>
+    <div class="form-group">
+        <label>Discount Type</label>
+        <select id="type">
+            <option value="FLAT">Flat Amount (₹)</option>
+            <option value="PERCENT">Percentage (%)</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Discount Value</label>
+        <input type="number" id="value" placeholder="e.g. 50 or 10">
+    </div>
+    <div class="form-group">
+        <label>Min Cart Value (Optional)</label>
+        <input type="number" id="minCart" value="0">
+    </div>
+    <div class="form-group">
+        <label>Start Date</label>
+        <input type="datetime-local" id="startDate">
+    </div>
+    <div class="form-group">
+        <label>End Date</label>
+        <input type="datetime-local" id="endDate">
+    </div>
+
+    <button onclick="createCoupon()">Create Coupon</button>
+    <p id="result"></p>
+
+    <script>
+        // Set default dates
+        document.getElementById('startDate').value = new Date().toISOString().slice(0,16);
+        document.getElementById('endDate').value = new Date(Date.now() + 86400000*30).toISOString().slice(0,16);
+
+        async function createCoupon() {
+            const payload = {
+                code: document.getElementById('code').value,
+                description: "Created via UI",
+                discountType: document.getElementById('type').value,
+                discountValue: parseFloat(document.getElementById('value').value),
+                startDate: new Date(document.getElementById('startDate').value).toISOString(),
+                endDate: new Date(document.getElementById('endDate').value).toISOString(),
+                eligibility: {
+                    minCartValue: parseFloat(document.getElementById('minCart').value) || 0,
+                    allowedUserTiers: ["GOLD", "PLATINUM", "REGULAR"], // Defaulting to all for simple UI
+                    allowedCountries: [],
+                    applicableCategories: [],
+                    excludedCategories: []
+                }
+            };
+
+            const response = await fetch('/coupons', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                document.getElementById('result').innerText = "Success! Coupon Created.";
+                document.getElementById('result').style.color = "green";
+            } else {
+                document.getElementById('result').innerText = "Error creating coupon.";
+            }
+        }
+    </script>
+</body>
+</html>
