@@ -18,7 +18,7 @@ This system solves the problem of finding the "Best Coupon" for a user's shoppin
 
 ## ⚙️ How to Run
 
-### 1. Prerequisites
+1. Prerequisites
 Ensure you have Python installed. You can verify this by running:
 ```bash
 python --version
